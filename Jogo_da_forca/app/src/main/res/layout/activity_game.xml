@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <!-- TextView para exibir a palavra com as letras adivinhadas -->
+    <TextView
+        android:id="@+id/wordTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Palavra"
+        android:textSize="24sp"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- EditText para o jogador digitar uma letra -->
+    <EditText
+        android:id="@+id/letterEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Digite uma letra"
+        android:maxLength="1"
+        android:inputType="text"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Botão para submeter a letra adivinhada -->
+    <Button
+        android:id="@+id/guessButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Adivinhar" />
+</LinearLayout>
