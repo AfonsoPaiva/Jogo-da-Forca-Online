@@ -40,14 +40,15 @@ class CreateRoomActivity : AppCompatActivity() {
                     "maxPlayers" to maxPlayers,
                     "currentPlayers" to 1,
                     "gameStarted" to false,
-                    "players" to listOf(playerName)
+                    "players" to listOf(playerName),
+                    "roomName" to roomName // Add room name to the data
                 )
 
                 roomRef.setValue(roomData).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val intent = Intent(this, WaitRoomActivity::class.java)
                         intent.putExtra("roomId", roomId)
-                        intent.putExtra("roomName", roomName)
+                        intent.putExtra("roomName", roomName) // Pass room name to WaitRoomActivity
                         startActivity(intent)
                     } else {
                         Toast.makeText(this, "Erro ao criar a sala. Tente novamente.", Toast.LENGTH_SHORT).show()

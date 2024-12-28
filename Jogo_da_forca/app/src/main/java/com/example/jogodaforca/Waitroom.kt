@@ -13,29 +13,35 @@ import com.google.firebase.database.*
 class WaitRoomActivity : AppCompatActivity() {
 
     private lateinit var roomId: String
+    private lateinit var roomName: String
     private lateinit var currentPlayersTextView: TextView
     private lateinit var startGameButton: Button
     private lateinit var playersListView: ListView
     private lateinit var roomIdTextView: TextView
-    private var currentPlayers = 1 // O host entra primeiro
+    private lateinit var roomNameTextView: TextView
+    private var currentPlayers = 1 // The host enters first
+    private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wait_room)
 
-        // Obter o ID da sala passado pela Intent
+        // Get the room ID and room name passed by the Intent
         roomId = intent.getStringExtra("roomId") ?: return
+        roomName = intent.getStringExtra("roomName") ?: "Waiting Room"
         currentPlayersTextView = findViewById(R.id.currentPlayersTextView)
         startGameButton = findViewById(R.id.startGameButton)
         playersListView = findViewById(R.id.playersListView)
         roomIdTextView = findViewById(R.id.roomIdTextView)
+        roomNameTextView = findViewById(R.id.roomNameTextView)
 
-        // Set the roomId in the TextView
+        // Set the room name and ID in the TextViews
+        roomNameTextView.text = "Nome da Sala: $roomName"
         roomIdTextView.text = "Room ID: $roomId"
 
-        val database = FirebaseDatabase.getInstance().reference.child("rooms").child(roomId)
+        database = FirebaseDatabase.getInstance().reference.child("rooms").child(roomId)
 
-        // Listener para monitorar mudanças na sala
+        // Listener to monitor changes in the room
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val room = snapshot.getValue(Room::class.java)
@@ -43,11 +49,11 @@ class WaitRoomActivity : AppCompatActivity() {
                     currentPlayers = room.currentPlayers
                     currentPlayersTextView.text = "Jogadores atuais: $currentPlayers/${room.maxPlayers}"
 
-                    // Habilitar o botão "Começar" se o número máximo de jogadores for alcançado e o jogador for o host
-                    startGameButton.isEnabled = currentPlayers == room.maxPlayers && room.host == "HostPlayer"
+                    // Enable the "Start Game" button if there is at least one player besides the host
+                    startGameButton.isEnabled = currentPlayers > 1
 
-                    // Atualizar a lista de jogadores
-                    updatePlayersList(room.players)
+                    // Update the list of players
+                    updatePlayersList(room.players, room.host)
                 }
             }
 
@@ -59,23 +65,30 @@ class WaitRoomActivity : AppCompatActivity() {
         startGameButton.setOnClickListener {
             database.child("rooms").child(roomId).get().addOnSuccessListener { snapshot ->
                 val room = snapshot.getValue(Room::class.java)
-                if (room != null && room.host == "HostPlayer" && room.currentPlayers == room.maxPlayers) {
+                if (currentPlayers > 1) {
                     database.child("rooms").child(roomId).child("status").setValue("In Progress")
                     val intent = Intent(this, GameActivity::class.java)
                     intent.putExtra("roomId", roomId)
                     startActivity(intent)
                 } else {
-                    Toast.makeText(this, "Você não é o host ou a sala não está cheia!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Não há jogadores suficientes!", Toast.LENGTH_SHORT).show()
                 }
             }
         }
-
     }
 
-    // Função para atualizar a lista de jogadores na interface
-    private fun updatePlayersList(players: List<String>) {
-        // Usando um adaptador simples para exibir a lista de jogadores no ListView
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, players)
+    override fun onDestroy() {
+        super.onDestroy()
+        // Remove the room from Firebase when the user leaves the page
+        database.removeValue()
+    }
+
+    // Function to update the list of players in the interface
+    private fun updatePlayersList(players: List<String>, host: String) {
+        // Add the prefix "host:" to the host's name
+        val displayPlayers = players.map { if (it == host) "host: $it" else it }
+        // Use a simple adapter to display the list of players in the ListView
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, displayPlayers)
         playersListView.adapter = adapter
     }
 }

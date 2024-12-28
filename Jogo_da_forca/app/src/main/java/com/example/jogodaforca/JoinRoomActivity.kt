@@ -33,7 +33,9 @@ class JoinRoomActivity : AppCompatActivity() {
                     if (snapshot.exists()) {
                         val room = snapshot.getValue(Room::class.java)
                         room?.let {
-                            if (room.currentPlayers < room.maxPlayers) {
+                            if (room.players.contains(playerName)) {
+                                roomIdEditText.error = "Nome já está em uso na sala!"
+                            } else if (room.currentPlayers < room.maxPlayers) {
                                 val updatedPlayers = room.players.toMutableList()
                                 updatedPlayers.add(playerName)
                                 roomRef.child("players").setValue(updatedPlayers)
@@ -41,6 +43,7 @@ class JoinRoomActivity : AppCompatActivity() {
 
                                 val intent = Intent(this, WaitRoomActivity::class.java)
                                 intent.putExtra("roomId", roomId)
+                                intent.putExtra("roomName", room.roomName)
                                 startActivity(intent)
                             } else {
                                 roomIdEditText.error = "Sala cheia!"

@@ -24,5 +24,8 @@
         android:id="@+id/playerNameEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Enter your name" />
+        android:hint="Enter your name"
+        android:inputType="textNoSuggestions"
+        android:importantForAutofill="no"
+        android:autofillHints=""/>
 </LinearLayout>
