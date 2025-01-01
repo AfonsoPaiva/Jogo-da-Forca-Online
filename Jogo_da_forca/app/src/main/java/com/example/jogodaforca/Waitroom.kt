@@ -21,6 +21,17 @@ class WaitRoomActivity : AppCompatActivity() {
     private lateinit var roomNameTextView: TextView
     private var currentPlayers = 1 // The host enters first
     private lateinit var database: DatabaseReference
+    private lateinit var hostName: String
+    private lateinit var playerName: String // Define playerName
+
+    // Function to update the list of players in the interface
+    private fun updatePlayersList(players: List<String>, host: String) {
+        // Add the prefix "host:" to the host's name
+        val displayPlayers = players.map { if (it == host) "host: $it" else it }
+        // Use a simple adapter to display the list of players in the ListView
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, displayPlayers)
+        playersListView.adapter = adapter
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +40,8 @@ class WaitRoomActivity : AppCompatActivity() {
         // Get the room ID and room name passed by the Intent
         roomId = intent.getStringExtra("roomId") ?: return
         roomName = intent.getStringExtra("roomName") ?: "Waiting Room"
+        playerName = intent.getStringExtra("playerName") ?: "Player" // Get playerName from Intent
+
         currentPlayersTextView = findViewById(R.id.currentPlayersTextView)
         startGameButton = findViewById(R.id.startGameButton)
         playersListView = findViewById(R.id.playersListView)
@@ -48,9 +61,16 @@ class WaitRoomActivity : AppCompatActivity() {
                 if (room != null) {
                     currentPlayers = room.currentPlayers
                     currentPlayersTextView.text = "Jogadores atuais: $currentPlayers/${room.maxPlayers}"
+                    hostName = room.host
 
-                    // Enable the "Start Game" button if there is at least one player besides the host
-                    startGameButton.isEnabled = currentPlayers > 1
+                    // Enable the "Start Game" button only for the host
+                    if (hostName == playerName) {
+                        startGameButton.isEnabled = true
+                        startGameButton.visibility = Button.VISIBLE
+                    } else {
+                        startGameButton.isEnabled = false
+                        startGameButton.visibility = Button.INVISIBLE
+                    }
 
                     // Update the list of players
                     updatePlayersList(room.players, room.host)
@@ -63,32 +83,39 @@ class WaitRoomActivity : AppCompatActivity() {
         })
 
         startGameButton.setOnClickListener {
-            database.child("rooms").child(roomId).get().addOnSuccessListener { snapshot ->
-                val room = snapshot.getValue(Room::class.java)
-                if (currentPlayers > 1) {
-                    database.child("rooms").child(roomId).child("status").setValue("In Progress")
+            if (hostName == playerName) {
+                database.child("gameStarted").setValue(true).addOnSuccessListener {
                     val intent = Intent(this, GameActivity::class.java)
                     intent.putExtra("roomId", roomId)
                     startActivity(intent)
-                } else {
-                    Toast.makeText(this, "Não há jogadores suficientes!", Toast.LENGTH_SHORT).show()
+                }.addOnFailureListener {
+                    Toast.makeText(this, "Erro ao iniciar o jogo.", Toast.LENGTH_SHORT).show()
                 }
+            } else {
+                Toast.makeText(this, "Apenas o host pode iniciar o jogo.", Toast.LENGTH_SHORT).show()
             }
         }
+
+        // Listen for game start
+        database.child("gameStarted").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val gameStarted = snapshot.getValue(Boolean::class.java) ?: false
+                if (gameStarted) {
+                    val intent = Intent(this@WaitRoomActivity, GameActivity::class.java)
+                    intent.putExtra("roomId", roomId)
+                    startActivity(intent)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@WaitRoomActivity, "Erro ao acessar os dados da sala.", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     override fun onDestroy() {
         super.onDestroy()
         // Remove the room from Firebase when the user leaves the page
         database.removeValue()
-    }
-
-    // Function to update the list of players in the interface
-    private fun updatePlayersList(players: List<String>, host: String) {
-        // Add the prefix "host:" to the host's name
-        val displayPlayers = players.map { if (it == host) "host: $it" else it }
-        // Use a simple adapter to display the list of players in the ListView
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, displayPlayers)
-        playersListView.adapter = adapter
     }
 }

@@ -1,5 +1,6 @@
 package com.example.jogodaforca
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -25,9 +26,15 @@ class MainActivity : AppCompatActivity() {
         createRoomButton = findViewById(R.id.createRoomButton)
         joinRoomButton = findViewById(R.id.joinRoomButton)
 
+        // Load saved player name
+        val sharedPreferences = getSharedPreferences("PlayerPrefs", Context.MODE_PRIVATE)
+        val savedPlayerName = sharedPreferences.getString("playerName", "")
+        playerNameEditText.setText(savedPlayerName)
+
         createRoomButton.setOnClickListener {
             val playerName = playerNameEditText.text.toString()
             if (playerName.isNotEmpty()) {
+                savePlayerName(playerName)
                 val intent = Intent(this, CreateRoomActivity::class.java)
                 intent.putExtra("playerName", playerName)
                 startActivity(intent)
@@ -39,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         joinRoomButton.setOnClickListener {
             val playerName = playerNameEditText.text.toString()
             if (playerName.isNotEmpty()) {
+                savePlayerName(playerName)
                 val intent = Intent(this, JoinRoomActivity::class.java)
                 intent.putExtra("playerName", playerName)
                 startActivity(intent)
@@ -47,4 +55,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun savePlayerName(playerName: String) {
+        val sharedPreferences = getSharedPreferences("PlayerPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("playerName", playerName)
+        editor.apply()
+
+    }
+
+
 }
+

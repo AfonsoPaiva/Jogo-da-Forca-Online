@@ -3,32 +3,75 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:padding="16dp">
 
-    <!-- TextView para exibir a palavra com as letras adivinhadas -->
+    <TextView
+        android:id="@+id/currentRoundTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Round: 1"
+        android:textSize="18sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/themeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Theme: Animals"
+        android:textSize="18sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+
     <TextView
         android:id="@+id/wordTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Palavra"
+        android:text="Word: _ _ _ _ _"
         android:textSize="24sp"
-        android:layout_marginBottom="24dp"/>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
 
-    <!-- EditText para o jogador digitar uma letra -->
-    <EditText
-        android:id="@+id/letterEditText"
+    <TextView
+        android:id="@+id/hintTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Digite uma letra"
-        android:maxLength="1"
-        android:inputType="text"
-        android:layout_marginBottom="24dp"/>
+        android:text="Hint: It is a mammal."
+        android:textSize="18sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
 
-    <!-- Botão para submeter a letra adivinhada -->
+    <EditText
+        android:id="@+id/guessEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter your guess"
+        android:inputType="text"
+        android:layout_marginBottom="16dp"/>
+
     <Button
         android:id="@+id/guessButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Guess"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/guessedLettersTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Adivinhar" />
+        android:text="Guessed Letters: "
+        android:textSize="18sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/wrongGuessCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wrong Guesses: 0"
+        android:textSize="18sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+
 </LinearLayout>

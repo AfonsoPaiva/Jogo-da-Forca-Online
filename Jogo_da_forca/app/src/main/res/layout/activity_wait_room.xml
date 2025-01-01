@@ -1,58 +1,43 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Nome da sala -->
     <TextView
         android:id="@+id/roomNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Nome da Sala: "
-        android:textSize="18sp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:textSize="18sp" />
 
-    <!-- Exibição do número de jogadores atuais -->
-    <TextView
-        android:id="@+id/currentPlayersTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Jogadores atuais: 1/4"
-        android:textSize="16sp"
-        android:layout_below="@id/roomNameTextView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp" />
-
-    <!-- Lista de jogadores -->
-    <ListView
-        android:id="@+id/playersListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/currentPlayersTextView"
-        android:layout_marginTop="20dp"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp"
-        android:padding="8dp" />
-
-    <!-- Botão de "Iniciar Jogo", apenas habilitado quando o número de jogadores for atingido -->
-    <Button
-        android:id="@+id/startGameButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Iniciar Jogo"
-        android:layout_below="@id/playersListView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:enabled="false" />
-
-    <!-- Exibição do ID da sala -->
     <TextView
         android:id="@+id/roomIdTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Room ID: "
-        android:layout_below="@id/startGameButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp" />
-</RelativeLayout>
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/currentPlayersTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Jogadores atuais: "
+        android:textSize="18sp" />
+
+    <ListView
+        android:id="@+id/playersListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp" />
+
+    <Button
+        android:id="@+id/startGameButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Iniciar Jogo"
+        android:visibility="invisible" />
+</LinearLayout>

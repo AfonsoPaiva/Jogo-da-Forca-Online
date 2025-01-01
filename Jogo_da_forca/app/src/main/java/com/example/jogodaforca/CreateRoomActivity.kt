@@ -15,25 +15,30 @@ class CreateRoomActivity : AppCompatActivity() {
     private lateinit var maxPlayersEditText: EditText
     private lateinit var createRoomButton: Button
     private lateinit var playerName: String
+    private lateinit var roundsEditText: EditText
+    private var roomId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_room)
 
         playerName = intent.getStringExtra("playerName") ?: "Player"
+        println("Player Name: $playerName") // Debugging line to check playerName
 
         roomNameEditText = findViewById(R.id.roomNameEditText)
         maxPlayersEditText = findViewById(R.id.maxPlayersEditText)
         createRoomButton = findViewById(R.id.createRoomButton)
+        roundsEditText = findViewById(R.id.roundsEditText)
 
         createRoomButton.setOnClickListener {
             val roomName = roomNameEditText.text.toString()
             val maxPlayers = maxPlayersEditText.text.toString().toIntOrNull()
+            val rounds = roundsEditText.text.toString().toIntOrNull() ?: 1
 
             if (roomName.isNotEmpty() && maxPlayers != null && maxPlayers > 1) {
-                val roomId = generateRoomId()
+                roomId = generateRoomId()
                 val database = FirebaseDatabase.getInstance().reference
-                val roomRef = database.child("rooms").child(roomId)
+                val roomRef = database.child("rooms").child(roomId!!)
 
                 val roomData = mapOf(
                     "host" to playerName,
@@ -41,21 +46,27 @@ class CreateRoomActivity : AppCompatActivity() {
                     "currentPlayers" to 1,
                     "gameStarted" to false,
                     "players" to listOf(playerName),
-                    "roomName" to roomName // Add room name to the data
+                    "roomName" to roomName,
+                    "rounds" to rounds,
+                    "currentRound" to 1
                 )
 
                 roomRef.setValue(roomData).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val intent = Intent(this, WaitRoomActivity::class.java)
                         intent.putExtra("roomId", roomId)
-                        intent.putExtra("roomName", roomName) // Pass room name to WaitRoomActivity
+                        intent.putExtra("roomName", roomName)
+                        intent.putExtra("playerName", playerName) // Ensure playerName is passed
                         startActivity(intent)
+
+
+
                     } else {
-                        Toast.makeText(this, "Erro ao criar a sala. Tente novamente.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Error creating room. Please try again.", Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {
-                Toast.makeText(this, "Por favor, preencha os campos corretamente.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please fill in the fields correctly.", Toast.LENGTH_SHORT).show()
             }
         }
     }

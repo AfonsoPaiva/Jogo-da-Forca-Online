@@ -19,12 +19,6 @@
         android:inputType="textNoSuggestions" />
 
 
-    <Button
-        android:id="@+id/createRoomButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Criar sala" />
-
     <EditText
         android:id="@+id/maxPlayersEditText"
         android:layout_width="match_parent"
@@ -32,6 +26,19 @@
         android:hint="Máximo de jogadores"
         android:inputType="number" />
 
+    <EditText
+        android:id="@+id/roundsEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Enter number of rounds"
+        android:inputType="number"
+        android:layout_marginBottom="16dp"/>
     <!-- Botão para criar a sala -->
+
+    <Button
+        android:id="@+id/createRoomButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Criar sala" />
 
 </LinearLayout>

@@ -15,9 +15,11 @@ data class Room(
     val maxPlayers: Int = 4, // Número máximo de jogadores
     val word: String = "",
     val guessedLetters: MutableList<String> = mutableListOf(), // Lista de letras adivinhadas
-    val roomName: String = ""
+    val roomName: String = "",
+    val currentRound: Int = 0, // Número atual da rodada
+    val gameStarted: Boolean = false, // Indica se o jogo começou
+    val rounds: Int = 0 // Número total de rodadas
 )
-
 
 class Networking {
 
@@ -33,7 +35,6 @@ class Networking {
             players = mutableListOf(hostName), // O host está na lista de jogadores
             maxPlayers = 4, // Defina o número máximo de jogadores (ex: 4)
             word = word
-
         )
         // Salva os dados da sala no Firebase
         database.reference.child("rooms").child(roomId).setValue(roomData)
