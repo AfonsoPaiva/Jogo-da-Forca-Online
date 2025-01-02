@@ -254,6 +254,8 @@ class GameActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
+                points -= 500
+                wrongGuessCountTextView.text = "Points: $points"
                 nextRound()
             }
         }.start()
