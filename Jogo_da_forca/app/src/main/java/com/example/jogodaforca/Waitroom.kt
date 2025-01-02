@@ -19,10 +19,12 @@ class WaitRoomActivity : AppCompatActivity() {
     private lateinit var playersListView: ListView
     private lateinit var roomIdTextView: TextView
     private lateinit var roomNameTextView: TextView
+    private lateinit var roundsTextView: TextView // Add TextView for rounds
     private var currentPlayers = 1 // The host enters first
     private lateinit var database: DatabaseReference
     private lateinit var hostName: String
     private lateinit var playerName: String // Define playerName
+    private var endRound: Int = 0 // Define endRound
 
     // Function to update the list of players in the interface
     private fun updatePlayersList(players: List<String>, host: String) {
@@ -47,6 +49,7 @@ class WaitRoomActivity : AppCompatActivity() {
         playersListView = findViewById(R.id.playersListView)
         roomIdTextView = findViewById(R.id.roomIdTextView)
         roomNameTextView = findViewById(R.id.roomNameTextView)
+        roundsTextView = findViewById(R.id.roundsTextView) // Initialize roundsTextView
 
         // Set the room name and ID in the TextViews
         roomNameTextView.text = "Nome da Sala: $roomName"
@@ -62,6 +65,8 @@ class WaitRoomActivity : AppCompatActivity() {
                     currentPlayers = room.currentPlayers
                     currentPlayersTextView.text = "Jogadores atuais: $currentPlayers/${room.maxPlayers}"
                     hostName = room.host
+                    endRound = room.endRound // Get endRound value
+                    roundsTextView.text = "Rounds: $endRound" // Display endRound value
 
                     // Enable the "Start Game" button only for the host
                     if (hostName == playerName) {
@@ -87,6 +92,7 @@ class WaitRoomActivity : AppCompatActivity() {
                 database.child("gameStarted").setValue(true).addOnSuccessListener {
                     val intent = Intent(this, GameActivity::class.java)
                     intent.putExtra("roomId", roomId)
+                    intent.putExtra("endRound", endRound) // Pass endRound value
                     startActivity(intent)
                 }.addOnFailureListener {
                     Toast.makeText(this, "Erro ao iniciar o jogo.", Toast.LENGTH_SHORT).show()
@@ -103,6 +109,7 @@ class WaitRoomActivity : AppCompatActivity() {
                 if (gameStarted) {
                     val intent = Intent(this@WaitRoomActivity, GameActivity::class.java)
                     intent.putExtra("roomId", roomId)
+                    intent.putExtra("endRound", endRound) // Pass endRound value
                     startActivity(intent)
                 }
             }

@@ -1,13 +1,21 @@
 package com.example.jogodaforca
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.Button
-import android.widget.EditText
+import android.widget.GridLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.google.firebase.database.*
+import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -15,34 +23,44 @@ import kotlin.concurrent.thread
 
 class GameActivity : AppCompatActivity() {
 
+    private lateinit var timerTextView: TextView
     private lateinit var wordTextView: TextView
-    private lateinit var guessEditText: EditText
-    private lateinit var guessButton: Button
-    private lateinit var guessedLettersTextView: TextView
     private lateinit var wrongGuessCountTextView: TextView
     private lateinit var currentRoundTextView: TextView
     private lateinit var hintTextView: TextView
+    private lateinit var wordImageView: ImageView
+    private lateinit var lettersGridLayout: GridLayout
+    private lateinit var loadingLayout: LinearLayout
     private var hiddenWord: String = ""
     private var guessedLetters: MutableList<Char> = mutableListOf()
     private var wrongGuessCount: Int = 0
+    private var points: Int = 1000
     private lateinit var roomRef: DatabaseReference
+    private var roundTimer: CountDownTimer? = null
+    private var endRound: Int = 0 // Default value
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
         // Initialize UI components
+        timerTextView = findViewById(R.id.timerTextView)
         wordTextView = findViewById(R.id.wordTextView)
-        guessEditText = findViewById(R.id.guessEditText)
-        guessButton = findViewById(R.id.guessButton)
-        guessedLettersTextView = findViewById(R.id.guessedLettersTextView)
         wrongGuessCountTextView = findViewById(R.id.wrongGuessCountTextView)
         currentRoundTextView = findViewById(R.id.currentRoundTextView)
         hintTextView = findViewById(R.id.hintTextView)
+        wordImageView = findViewById(R.id.wordImageView)
+        lettersGridLayout = findViewById(R.id.lettersGridLayout)
+        loadingLayout = findViewById(R.id.loadingLayout)
 
-        // Get roomId from Intent
+        // Get roomId and endRound from Intent
         val roomId = intent.getStringExtra("roomId") ?: run {
-            Toast.makeText(this, "Erro: ID da sala não encontrado.", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+        val endRound = intent.getIntExtra("endRound", 0) // Default to -1 if not provided
+        if (endRound == 0) {
+            Log.e("GameActivity", "endRound value not passed correctly")
             finish()
             return
         }
@@ -59,24 +77,40 @@ class GameActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@GameActivity, "Erro ao acessar os dados da sala.", Toast.LENGTH_SHORT).show()
-            }
+            override fun onCancelled(error: DatabaseError) {}
         })
 
-        // Configure guess button
-        guessButton.setOnClickListener {
-            val guess = guessEditText.text.toString().trim().lowercase()
-            if (guess.isNotEmpty()) {
-                if (guess.length == 1) {
-                    handleGuess(roomRef, guess[0])
-                } else {
-                    handleWordGuess(roomRef, guess)
+        // Dynamically create letter buttons
+        createLetterButtons()
+    }
+
+    private fun createLetterButtons() {
+        val letters = ('A'..'Z').toList()
+        letters.forEach { letter ->
+            val button = Button(this).apply {
+                text = letter.toString()
+                layoutParams = GridLayout.LayoutParams().apply {
+                    width = 0
+                    height = ViewGroup.LayoutParams.WRAP_CONTENT
+                    columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                 }
-            } else {
-                Toast.makeText(this, "Por favor, insira uma letra ou palavra.", Toast.LENGTH_SHORT).show()
+                setOnClickListener {
+                    handleGuess(roomRef, letter.lowercaseChar(), this)
+                }
             }
+            lettersGridLayout.addView(button)
         }
+    }
+
+    private fun resetLetterButtons() {
+        for (i in 0 until lettersGridLayout.childCount) {
+            val button = lettersGridLayout.getChildAt(i) as Button
+            button.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onBackPressed() {
+        // Do nothing to prevent going back
     }
 
     private fun startGame(roomId: String) {
@@ -85,95 +119,162 @@ class GameActivity : AppCompatActivity() {
             currentRoundTextView.text = "Round: $currentRound"
         }
         fetchRandomWordAndHint()
-        startRoundTimer()
     }
 
     private fun fetchRandomWordAndHint() {
+        // Show loading layout and stop the timer
+        runOnUiThread {
+            val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+            loadingLayout.startAnimation(fadeIn)
+            loadingLayout.visibility = View.VISIBLE
+            roundTimer?.cancel()
+        }
+
         thread {
-            try {
-                val url = URL("https://wordsapiv1.p.rapidapi.com/words/?random=true")
-                val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "GET"
-                connection.setRequestProperty("x-rapidapi-key", "YOUR_RAPIDAPI_KEY")
-                connection.setRequestProperty("x-rapidapi-host", "wordsapiv1.p.rapidapi.com")
+            var word = ""
+            var definition = ""
+            var imageUrl = ""
+            var validWordFound = false
 
-                val responseCode = connection.responseCode
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    val response = connection.inputStream.bufferedReader().use { it.readText() }
-                    val jsonResponse = JSONObject(response)
-                    val word = jsonResponse.getString("word")
-                    val definition = jsonResponse.getJSONArray("results").getJSONObject(0).getString("definition")
+            while (!validWordFound) {
+                try {
+                    // Fetch random word
+                    val wordUrl = URL("https://random-word-api.herokuapp.com/word?number=1")
+                    val wordConnection = wordUrl.openConnection() as HttpURLConnection
+                    wordConnection.requestMethod = "GET"
 
-                    runOnUiThread {
-                        hiddenWord = word
-                        wordTextView.text = "Word: ${"_ ".repeat(hiddenWord.length)}"
-                        hintTextView.text = "Hint: $definition"
+                    val wordResponseCode = wordConnection.responseCode
+                    if (wordResponseCode == HttpURLConnection.HTTP_OK) {
+                        val wordResponse = wordConnection.inputStream.bufferedReader().use { it.readText() }
+                        val wordJsonArray = JSONArray(wordResponse)
+                        if (wordJsonArray.length() > 0) {
+                            word = wordJsonArray.getString(0)
+
+                            // Fetch word definition
+                            val definitionUrl = URL("https://api.dictionaryapi.dev/api/v2/entries/en/$word")
+                            val definitionConnection = definitionUrl.openConnection() as HttpURLConnection
+                            definitionConnection.requestMethod = "GET"
+
+                            val definitionResponseCode = definitionConnection.responseCode
+                            if (definitionResponseCode == HttpURLConnection.HTTP_OK) {
+                                val definitionResponse = definitionConnection.inputStream.bufferedReader().use { it.readText() }
+                                val definitionJsonArray = JSONArray(definitionResponse)
+                                if (definitionJsonArray.length() > 0) {
+                                    val definitionJson = definitionJsonArray.getJSONObject(0)
+                                    val meaningsArray = definitionJson.getJSONArray("meanings")
+                                    if (meaningsArray.length() > 0) {
+                                        val definitionsArray = meaningsArray.getJSONObject(0).getJSONArray("definitions")
+                                        if (definitionsArray.length() > 0) {
+                                            definition = definitionsArray.getJSONObject(0).getString("definition")
+
+                                            // Fetch word image from Wikipedia API
+                                            val wikiUrl = URL("https://en.wikipedia.org/w/api.php?action=query&titles=$word&prop=pageimages&format=json&pithumbsize=200")
+                                            val wikiConnection = wikiUrl.openConnection() as HttpURLConnection
+                                            wikiConnection.requestMethod = "GET"
+
+                                            val wikiResponseCode = wikiConnection.responseCode
+                                            if (wikiResponseCode == HttpURLConnection.HTTP_OK) {
+                                                val wikiResponse = wikiConnection.inputStream.bufferedReader().use { it.readText() }
+                                                val wikiJson = JSONObject(wikiResponse)
+                                                val pages = wikiJson.getJSONObject("query").getJSONObject("pages")
+                                                val page = pages.keys().asSequence().firstOrNull()?.let { pages.getJSONObject(it) }
+                                                if (page != null && page.has("thumbnail")) {
+                                                    imageUrl = page.getJSONObject("thumbnail").getString("source")
+                                                    validWordFound = true
+                                                }
+                                            }
+                                            wikiConnection.disconnect()
+                                        }
+                                    }
+                                }
+                                definitionConnection.disconnect()
+                            }
+                            wordConnection.disconnect()
+                        }
                     }
-                } else {
-                    runOnUiThread {
-                        Toast.makeText(this@GameActivity, "Failed to fetch word", Toast.LENGTH_SHORT).show()
-                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    // Use default word and definition in case of failure
+                    word = "error"
+                    definition = "An error occurred"
                 }
-                connection.disconnect()
-            } catch (e: Exception) {
-                runOnUiThread {
-                    Toast.makeText(this@GameActivity, "Failed to fetch word", Toast.LENGTH_SHORT).show()
+            }
+
+            runOnUiThread {
+                if (!isDestroyed) {
+                    hiddenWord = word
+                    wordTextView.text = "Word: ${"_ ".repeat(hiddenWord.length)}"
+                    hintTextView.text = "Hint: $definition"
+                    if (imageUrl.isNotEmpty()) {
+                        Glide.with(this).load(imageUrl).into(wordImageView)
+                    } else {
+                        Log.d("GameActivity", "Image URL is empty")
+                    }
+                    // Hide loading layout and start the timer
+                    loadingLayout.visibility = View.GONE
+                    startRoundTimer()
                 }
             }
         }
     }
 
-    private fun handleGuess(roomRef: DatabaseReference, guess: Char) {
+    private fun handleGuess(roomRef: DatabaseReference, guess: Char, button: Button) {
         if (guessedLetters.contains(guess)) {
-            Toast.makeText(this, "You already guessed that letter.", Toast.LENGTH_SHORT).show()
             return
         }
 
         guessedLetters.add(guess)
-        guessedLettersTextView.text = "Guessed Letters: ${guessedLetters.joinToString(", ")}"
+        button.visibility = View.GONE
 
         if (hiddenWord.contains(guess)) {
+            points += 10
             val updatedWord = hiddenWord.map { if (guessedLetters.contains(it)) it else '_' }.joinToString(" ")
             wordTextView.text = "Word: $updatedWord"
             if (!updatedWord.contains('_')) {
-                Toast.makeText(this, "Congratulations! You've guessed the word!", Toast.LENGTH_SHORT).show()
-                // Handle end of round or game
+                nextRound()
             }
         } else {
-            wrongGuessCount++
-            wrongGuessCountTextView.text = "Wrong Guesses: $wrongGuessCount"
-            if (wrongGuessCount >= 6) { // Assuming 6 wrong guesses end the game
-                Toast.makeText(this, "Game Over! The word was $hiddenWord.", Toast.LENGTH_SHORT).show()
-                // Handle end of game
-            }
+            points -= 20
         }
+        wrongGuessCountTextView.text = "Points: $points"
     }
 
     private fun handleWordGuess(roomRef: DatabaseReference, guess: String) {
         if (guess == hiddenWord) {
-            Toast.makeText(this, "Congratulations! You've guessed the word!", Toast.LENGTH_SHORT).show()
-            // Handle end of round or game
-        } else {
-            wrongGuessCount++
-            wrongGuessCountTextView.text = "Wrong Guesses: $wrongGuessCount"
-            if (wrongGuessCount >= 6) { // Assuming 6 wrong guesses end the game
-                Toast.makeText(this, "Game Over! The word was $hiddenWord.", Toast.LENGTH_SHORT).show()
-                // Handle end of game
-            }
+            nextRound()
         }
     }
 
     private fun startRoundTimer() {
-        // Start a countdown timer for the round
-        object : CountDownTimer(60000, 1000) {
+        roundTimer?.cancel() // Cancel any existing timer
+        roundTimer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                // Update UI with the remaining time
+                timerTextView.text = "Time: ${millisUntilFinished / 1000}"
             }
 
             override fun onFinish() {
-                // Handle end of round
-                Toast.makeText(this@GameActivity, "Time's up!", Toast.LENGTH_SHORT).show()
+                nextRound()
             }
         }.start()
+    }
+
+    private fun nextRound() {
+        roomRef.child("currentRound").get().addOnSuccessListener { snapshot ->
+            val currentRound = snapshot.getValue(Int::class.java) ?: 1
+            if (currentRound > endRound + 1) {
+                Log.d("GameActivity", "Game ended")
+                val intent = Intent(this, EndGameActivity::class.java)
+                intent.putExtra("roomId", roomRef.key)
+                startActivity(intent)
+                finish()
+            } else {
+                roomRef.child("currentRound").setValue(currentRound + 1)
+                currentRoundTextView.text = "Round: ${currentRound + 1}"
+                guessedLetters.clear()
+                wrongGuessCount = 0
+                resetLetterButtons()
+                fetchRandomWordAndHint()
+            }
+        }
     }
 }

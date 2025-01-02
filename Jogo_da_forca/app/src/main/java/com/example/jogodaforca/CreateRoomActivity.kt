@@ -47,7 +47,7 @@ class CreateRoomActivity : AppCompatActivity() {
                     "gameStarted" to false,
                     "players" to listOf(playerName),
                     "roomName" to roomName,
-                    "rounds" to rounds,
+                    "endRound" to rounds,
                     "currentRound" to 1
                 )
 
@@ -57,10 +57,8 @@ class CreateRoomActivity : AppCompatActivity() {
                         intent.putExtra("roomId", roomId)
                         intent.putExtra("roomName", roomName)
                         intent.putExtra("playerName", playerName) // Ensure playerName is passed
+                        intent.putExtra("endRound", rounds) // Pass the end round value
                         startActivity(intent)
-
-
-
                     } else {
                         Toast.makeText(this, "Error creating room. Please try again.", Toast.LENGTH_SHORT).show()
                     }

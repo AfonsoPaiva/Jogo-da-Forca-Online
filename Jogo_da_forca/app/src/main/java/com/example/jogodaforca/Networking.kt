@@ -8,17 +8,18 @@ import com.google.firebase.database.ValueEventListener
 
 data class Room(
     val roomId: String = "",
-    val status: String = "Waiting", // Status da sala: "Waiting", "In Progress", "Finished"
-    val host: String = "", // Jogador que criou a sala (host)
-    val players: MutableList<String> = mutableListOf(), // Lista de jogadores
-    val currentPlayers: Int = 0, // Número atual de jogadores
-    val maxPlayers: Int = 4, // Número máximo de jogadores
+    val status: String = "Waiting", // Status of the room: "Waiting", "In Progress", "Finished"
+    val host: String = "", // Player who created the room (host)
+    val players: MutableList<String> = mutableListOf(), // List of players
+    val currentPlayers: Int = 0, // Current number of players
+    val maxPlayers: Int = 4, // Maximum number of players
     val word: String = "",
-    val guessedLetters: MutableList<String> = mutableListOf(), // Lista de letras adivinhadas
+    val guessedLetters: MutableList<String> = mutableListOf(), // List of guessed letters
     val roomName: String = "",
-    val currentRound: Int = 0, // Número atual da rodada
-    val gameStarted: Boolean = false, // Indica se o jogo começou
-    val rounds: Int = 0 // Número total de rodadas
+    val currentRound: Int = 0, // Current round number
+    val gameStarted: Boolean = false, // Indicates if the game has started
+    val rounds: Int = 0, // Total number of rounds
+    val endRound: Int = 10 // End round value
 )
 
 class Networking {
@@ -27,14 +28,15 @@ class Networking {
     private var roomRef: DatabaseReference? = null
 
     // Cria uma sala no Firebase com o número máximo de jogadores e o host
-    fun createRoom(roomId: String, word: String, hostName: String) {
+    fun createRoom(roomId: String, word: String, hostName: String, endRound: Int) {
         val roomData = Room(
             roomId = roomId,
             host = hostName,
             currentPlayers = 1, // O host é o primeiro jogador
             players = mutableListOf(hostName), // O host está na lista de jogadores
             maxPlayers = 4, // Defina o número máximo de jogadores (ex: 4)
-            word = word
+            word = word,
+            endRound = endRound
         )
         // Salva os dados da sala no Firebase
         database.reference.child("rooms").child(roomId).setValue(roomData)
@@ -66,6 +68,7 @@ class Networking {
     fun startGame(roomId: String) {
         roomRef = database.reference.child("rooms").child(roomId)
         roomRef?.child("status")?.setValue("In Progress")
+        roomRef?.child("gameStarted")?.setValue(true)
     }
 
     // Faz uma tentativa de adivinhar uma letra
@@ -80,6 +83,25 @@ class Networking {
                 roomRef?.child("guessedLetters")?.setValue(guessedLetters)
             }
         }
+    }
+
+    // Verifica se o jogo deve terminar
+    fun checkEndGame(roomId: String) {
+        roomRef = database.reference.child("rooms").child(roomId)
+
+        roomRef?.get()?.addOnSuccessListener {
+            val room = it.getValue(Room::class.java)
+            if (room != null && room.currentRound >= room.endRound) {
+                endGame(roomId)
+            }
+        }
+    }
+
+    // Termina o jogo (muda o status da sala)
+    fun endGame(roomId: String) {
+        roomRef = database.reference.child("rooms").child(roomId)
+        roomRef?.child("status")?.setValue("Finished")
+        roomRef?.child("gameStarted")?.setValue(false)
     }
 
     // Faz o "listener" escutar as mudanças na sala em tempo real

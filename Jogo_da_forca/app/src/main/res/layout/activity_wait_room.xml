@@ -1,43 +1,45 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    tools:context=".WaitRoomActivity">
 
     <TextView
         android:id="@+id/roomNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nome da Sala: "
-        android:textSize="18sp" />
+        android:text="Room Name" />
 
     <TextView
         android:id="@+id/roomIdTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Room ID: "
-        android:textSize="18sp" />
+        android:text="Room ID" />
 
     <TextView
         android:id="@+id/currentPlayersTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Jogadores atuais: "
-        android:textSize="18sp" />
+        android:text="Current Players" />
+
+    <TextView
+        android:id="@+id/roundsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rounds" /> <!-- Add this TextView -->
 
     <ListView
         android:id="@+id/playersListView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp" />
+        android:layout_weight="1" />
 
     <Button
         android:id="@+id/startGameButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Iniciar Jogo"
+        android:text="Start Game"
+        android:enabled="false"
         android:visibility="invisible" />
 </LinearLayout>

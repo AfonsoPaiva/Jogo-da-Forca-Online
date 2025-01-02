@@ -26,8 +26,13 @@
         </activity>
 
         <activity android:name=".CreateRoomActivity" />
-        <activity android:name=".GameActivity" />
+        <activity
+            android:name=".GameActivity"
+            android:screenOrientation="portrait"
+            android:noHistory="true">
+        </activity>
         <activity android:name=".JoinRoomActivity" />
+        <activity android:name=".EndGameActivity" />
     </application>
 
 </manifest>
