@@ -23,7 +23,6 @@ class CreateRoomActivity : AppCompatActivity() {
         setContentView(R.layout.activity_create_room)
 
         playerName = intent.getStringExtra("playerName") ?: "Player"
-        println("Player Name: $playerName") // Debugging line to check playerName
 
         roomNameEditText = findViewById(R.id.roomNameEditText)
         maxPlayersEditText = findViewById(R.id.maxPlayersEditText)
@@ -45,7 +44,12 @@ class CreateRoomActivity : AppCompatActivity() {
                     "maxPlayers" to maxPlayers,
                     "currentPlayers" to 1,
                     "gameStarted" to false,
-                    "players" to listOf(playerName),
+                    "players" to mapOf(
+                        playerName to Player(
+                            playerName,
+                            0
+                        )
+                    ), // Initialize player points to 0
                     "roomName" to roomName,
                     "endRound" to rounds,
                     "currentRound" to 1
@@ -56,21 +60,17 @@ class CreateRoomActivity : AppCompatActivity() {
                         val intent = Intent(this, WaitRoomActivity::class.java)
                         intent.putExtra("roomId", roomId)
                         intent.putExtra("roomName", roomName)
-                        intent.putExtra("playerName", playerName) // Ensure playerName is passed
-                        intent.putExtra("endRound", rounds) // Pass the end round value
+                        intent.putExtra("playerName", playerName)
+                        intent.putExtra("endRound", rounds)
                         startActivity(intent)
-                    } else {
-                        Toast.makeText(this, "Error creating room. Please try again.", Toast.LENGTH_SHORT).show()
                     }
                 }
-            } else {
-                Toast.makeText(this, "Please fill in the fields correctly.", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun generateRoomId(): String {
-        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         val random = Random()
         val roomId = StringBuilder()
         for (i in 0 until 5) {

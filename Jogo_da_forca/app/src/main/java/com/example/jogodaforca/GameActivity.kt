@@ -37,7 +37,9 @@ class GameActivity : AppCompatActivity() {
     private var points: Int = 1000
     private lateinit var roomRef: DatabaseReference
     private var roundTimer: CountDownTimer? = null
-    private var endRound: Int = 0 // Default value
+    private var endRound: Int = 0
+    private lateinit var playerName: String
+    private lateinit var roomId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,12 +55,16 @@ class GameActivity : AppCompatActivity() {
         lettersGridLayout = findViewById(R.id.lettersGridLayout)
         loadingLayout = findViewById(R.id.loadingLayout)
 
-        // Get roomId and endRound from Intent
-        val roomId = intent.getStringExtra("roomId") ?: run {
+        // Get roomId, playerName, and endRound from Intent
+        roomId = intent.getStringExtra("roomId") ?: run {
             finish()
             return
         }
-        val endRound = intent.getIntExtra("endRound", 0) // Default to -1 if not provided
+        playerName = intent.getStringExtra("playerName") ?: run {
+            finish()
+            return
+        }
+        endRound = intent.getIntExtra("endRound", 0)
         if (endRound == 0) {
             Log.e("GameActivity", "endRound value not passed correctly")
             finish()
@@ -73,7 +79,7 @@ class GameActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val gameStarted = snapshot.getValue(Boolean::class.java) ?: false
                 if (gameStarted) {
-                    startGame(roomId)
+                    startGame()
                 }
             }
 
@@ -95,7 +101,7 @@ class GameActivity : AppCompatActivity() {
                     columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                 }
                 setOnClickListener {
-                    handleGuess(roomRef, letter.lowercaseChar(), this)
+                    handleGuess(letter.lowercaseChar(), this)
                 }
             }
             lettersGridLayout.addView(button)
@@ -113,7 +119,7 @@ class GameActivity : AppCompatActivity() {
         // Do nothing to prevent going back
     }
 
-    private fun startGame(roomId: String) {
+    private fun startGame() {
         roomRef.child("currentRound").get().addOnSuccessListener { snapshot ->
             val currentRound = snapshot.getValue(Int::class.java) ?: 1
             currentRoundTextView.text = "Round: $currentRound"
@@ -213,12 +219,13 @@ class GameActivity : AppCompatActivity() {
                     // Hide loading layout and start the timer
                     loadingLayout.visibility = View.GONE
                     startRoundTimer()
+                    resetLetterButtons()
                 }
             }
         }
     }
 
-    private fun handleGuess(roomRef: DatabaseReference, guess: Char, button: Button) {
+    private fun handleGuess(guess: Char, button: Button) {
         if (guessedLetters.contains(guess)) {
             return
         }
@@ -239,12 +246,6 @@ class GameActivity : AppCompatActivity() {
         wrongGuessCountTextView.text = "Points: $points"
     }
 
-    private fun handleWordGuess(roomRef: DatabaseReference, guess: String) {
-        if (guess == hiddenWord) {
-            nextRound()
-        }
-    }
-
     private fun startRoundTimer() {
         roundTimer?.cancel() // Cancel any existing timer
         roundTimer = object : CountDownTimer(60000, 1000) {
@@ -261,18 +262,26 @@ class GameActivity : AppCompatActivity() {
     private fun nextRound() {
         roomRef.child("currentRound").get().addOnSuccessListener { snapshot ->
             val currentRound = snapshot.getValue(Int::class.java) ?: 1
-            if (currentRound > endRound + 1) {
+            Log.d("GameActivity", "Current Round: $currentRound")
+            Log.d("GameActivity", "End Round: $endRound")
+            if (currentRound >= endRound) {
                 Log.d("GameActivity", "Game ended")
-                val intent = Intent(this, EndGameActivity::class.java)
-                intent.putExtra("roomId", roomRef.key)
-                startActivity(intent)
-                finish()
+                // Update points in the database
+                roomRef.child("players").child(playerName).get().addOnSuccessListener { playerSnapshot ->
+                    val currentPoints = playerSnapshot.getValue(Player::class.java)?.points ?: 0
+                    roomRef.child("players").child(playerName).setValue(Player(playerName, currentPoints + points)).addOnCompleteListener {
+                        val intent = Intent(this, EndGameActivity::class.java)
+                        intent.putExtra("roomId", roomRef.key)
+                        intent.putExtra("playerName", playerName)
+                        startActivity(intent)
+                        finish()
+                    }
+                }
             } else {
                 roomRef.child("currentRound").setValue(currentRound + 1)
                 currentRoundTextView.text = "Round: ${currentRound + 1}"
                 guessedLetters.clear()
                 wrongGuessCount = 0
-                resetLetterButtons()
                 fetchRandomWordAndHint()
             }
         }

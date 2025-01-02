@@ -61,9 +61,5 @@ class MainActivity : AppCompatActivity() {
         val editor = sharedPreferences.edit()
         editor.putString("playerName", playerName)
         editor.apply()
-
     }
-
-
 }
-

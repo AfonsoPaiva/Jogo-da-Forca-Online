@@ -33,28 +33,29 @@ class JoinRoomActivity : AppCompatActivity() {
                     if (snapshot.exists()) {
                         val room = snapshot.getValue(Room::class.java)
                         room?.let {
-                            if (room.players.contains(playerName)) {
-                                roomIdEditText.error = "Nome já está em uso na sala!"
+                            if (room.players.containsKey(playerName)) {
+                                roomIdEditText.error = "Name already in use in the room!"
                             } else if (room.currentPlayers < room.maxPlayers) {
-                                val updatedPlayers = room.players.toMutableList()
-                                updatedPlayers.add(playerName)
+                                val updatedPlayers = room.players.toMutableMap()
+                                updatedPlayers[playerName] = Player(playerName, 0) // Initialize player points to 0
                                 roomRef.child("players").setValue(updatedPlayers)
                                 roomRef.child("currentPlayers").setValue(room.currentPlayers + 1)
 
                                 val intent = Intent(this, WaitRoomActivity::class.java)
                                 intent.putExtra("roomId", roomId)
                                 intent.putExtra("roomName", room.roomName)
+                                intent.putExtra("playerName", playerName)
                                 startActivity(intent)
                             } else {
-                                roomIdEditText.error = "Sala cheia!"
+                                roomIdEditText.error = "Room is full!"
                             }
                         }
                     } else {
-                        roomIdEditText.error = "Sala não encontrada!"
+                        roomIdEditText.error = "Room not found!"
                     }
                 }
             } else {
-                roomIdEditText.error = "O ID da sala não pode estar vazio!"
+                roomIdEditText.error = "Room ID cannot be empty!"
             }
         }
     }
