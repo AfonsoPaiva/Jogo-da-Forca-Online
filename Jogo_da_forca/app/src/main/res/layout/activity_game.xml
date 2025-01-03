@@ -1,6 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#2F2F41">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,17 +12,21 @@
             android:id="@+id/timerTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/mainfont"
+            android:padding="6dp"
             android:text="Time: 60"
-            android:textSize="18sp"
-            android:padding="16dp" />
+            android:textColor="#AEB1AD"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/currentRoundTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/mainfont"
+            android:padding="6dp"
             android:text="Round: 1"
-            android:textSize="18sp"
-            android:padding="16dp" />
+            android:textColor="#AEB1AD"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/wordTextView"
@@ -29,7 +34,9 @@
             android:layout_height="wrap_content"
             android:text="Word: _ _ _ _"
             android:textSize="24sp"
-            android:padding="16dp" />
+            android:padding="6dp"
+            android:fontFamily="@font/mainfont"
+            android:textColor="#AEB1AD"/>
 
         <TextView
             android:id="@+id/hintTextView"
@@ -37,7 +44,9 @@
             android:layout_height="wrap_content"
             android:text="Hint: Definition"
             android:textSize="18sp"
-            android:padding="16dp" />
+            android:padding="9dp"
+            android:fontFamily="@font/mainfont"
+            android:textColor="#AEB1AD"/>
 
         <ImageView
             android:id="@+id/wordImageView"
@@ -53,7 +62,9 @@
             android:layout_height="wrap_content"
             android:text="Points: 1000"
             android:textSize="18sp"
-            android:padding="16dp" />
+            android:padding="5dp"
+            android:fontFamily="@font/mainfont"
+            android:textColor="#AEB1AD"/>
 
         <GridLayout
             android:id="@+id/lettersGridLayout"
@@ -61,8 +72,10 @@
             android:layout_height="wrap_content"
             android:columnCount="7"
             android:rowCount="4"
-            android:layout_marginTop="16dp"
-            android:padding="16dp">
+            android:layout_marginTop="2dp"
+            android:padding="5dp"
+            android:fontFamily="@font/mainfont"
+            android:textColor="#AEB1AD">
         </GridLayout>
 
     </LinearLayout>

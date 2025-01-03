@@ -120,8 +120,9 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun startGame() {
-        roomRef.child("currentRound").get().addOnSuccessListener { snapshot ->
-            val currentRound = snapshot.getValue(Int::class.java) ?: 1
+        roomRef.child("players").child(playerName).get().addOnSuccessListener { snapshot ->
+            val player = snapshot.getValue(Player::class.java)
+            val currentRound = player?.currentRound ?: 1
             currentRoundTextView.text = "Round: $currentRound"
         }
         fetchRandomWordAndHint()
@@ -262,25 +263,23 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun nextRound() {
-        roomRef.child("currentRound").get().addOnSuccessListener { snapshot ->
-            val currentRound = snapshot.getValue(Int::class.java) ?: 1
+        roomRef.child("players").child(playerName).get().addOnSuccessListener { snapshot ->
+            val player = snapshot.getValue(Player::class.java)
+            val currentRound = player?.currentRound ?: 1
             Log.d("GameActivity", "Current Round: $currentRound")
             Log.d("GameActivity", "End Round: $endRound")
             if (currentRound >= endRound) {
                 Log.d("GameActivity", "Game ended")
                 // Update points in the database
-                roomRef.child("players").child(playerName).get().addOnSuccessListener { playerSnapshot ->
-                    val currentPoints = playerSnapshot.getValue(Player::class.java)?.points ?: 0
-                    roomRef.child("players").child(playerName).setValue(Player(playerName, currentPoints + points)).addOnCompleteListener {
-                        val intent = Intent(this, EndGameActivity::class.java)
-                        intent.putExtra("roomId", roomRef.key)
-                        intent.putExtra("playerName", playerName)
-                        startActivity(intent)
-                        finish()
-                    }
+                roomRef.child("players").child(playerName).setValue(player?.copy(points = player.points + points)).addOnCompleteListener {
+                    val intent = Intent(this, EndGameActivity::class.java)
+                    intent.putExtra("roomId", roomRef.key)
+                    intent.putExtra("playerName", playerName)
+                    startActivity(intent)
+                    finish()
                 }
             } else {
-                roomRef.child("currentRound").setValue(currentRound + 1)
+                roomRef.child("players").child(playerName).setValue(player?.copy(currentRound = currentRound + 1))
                 currentRoundTextView.text = "Round: ${currentRound + 1}"
                 guessedLetters.clear()
                 wrongGuessCount = 0

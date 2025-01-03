@@ -4,28 +4,54 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#2F2F41">
+
+    <!-- Image at the top -->
+    <ImageView
+        android:id="@+id/topImageView"
+        android:layout_width="332dp"
+        android:layout_height="345dp"
+        android:src="@drawable/hang" />
 
     <!-- Botão para criar a sala -->
     <Button
         android:id="@+id/createRoomButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Criar Sala" />
+        android:text="New Room"
+        android:textColor="#AEB1AD"
+        android:fontFamily="@font/mainfont"
+        android:textFontWeight="800"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/button_background"
+        android:padding="16dp"
+        />
 
-    <!-- Botão para entrar em uma sala -->
     <Button
         android:id="@+id/joinRoomButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Entrar na Sala" />
+        android:background="@drawable/button_background"
+        android:text="Enter Room"
+        android:fontFamily="@font/mainfont"
+        android:textFontWeight="800"
+        android:layout_marginTop="16dp"
+        android:color="#AEB1AD"
+        android:textColor="#AEB1AD"
+        android:padding="16dp" />
 
     <EditText
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#AEB1AD"
+        android:textColorHint ="#AEB1AD"
         android:id="@+id/playerNameEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:fontFamily="@font/mainfont"
         android:hint="Enter your name"
-        android:inputType="textNoSuggestions"
+        android:textColor="#AEB1AD"
         android:importantForAutofill="no"
-        android:autofillHints=""/>
+        android:inputType="textNoSuggestions" />
 </LinearLayout>

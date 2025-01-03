@@ -4,13 +4,26 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@android:color/white">
+    android:background="#2F2F41">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="262dp"
         android:layout_height="wrap_content"
-        android:text="Loading..."
-        android:textSize="24sp"
-        android:textColor="@android:color/black" />
+        android:fontFamily="@font/mainfont"
+        android:text="Loading"
+        android:textColor="#AEB1AD"
+        android:textSize="60sp"
+        android:layout_gravity="center" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="267dp"
+        android:layout_height="42dp"
+        android:layout_marginBottom="16dp"
+        android:progressTint="#AEB1AD"
+        android:indeterminateTint="#AEB1AD"
+        android:indeterminate="true" />
+
+
 
 </LinearLayout>

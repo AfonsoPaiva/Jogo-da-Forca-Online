@@ -51,9 +51,7 @@ class CreateRoomActivity : AppCompatActivity() {
                         )
                     ), // Initialize player points to 0
                     "roomName" to roomName,
-                    "endRound" to rounds,
-                    "currentRound" to 1
-                )
+                    "endRound" to rounds,)
 
                 roomRef.setValue(roomData).addOnCompleteListener { task ->
                     if (task.isSuccessful) {

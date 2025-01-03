@@ -3,42 +3,80 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".WaitRoomActivity">
+    tools:context=".WaitRoomActivity"
+    android:background="#40435B">
 
     <TextView
         android:id="@+id/roomNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Room Name" />
+        android:text="Room Name"
+        android:fontFamily="@font/mainfont"
+        android:textColor="#AEB1AD"
+        android:textSize="24sp"
+        android:padding="6dp"
+        />
 
     <TextView
         android:id="@+id/roomIdTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Room ID" />
+        android:text="Room ID"
+        android:fontFamily="@font/mainfont"
+        android:textColor="#AEB1AD"
+        android:textSize="24sp"
+        android:padding="6dp"
+        />
 
     <TextView
         android:id="@+id/currentPlayersTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Current Players" />
+        android:text="Current Players"
+        android:fontFamily="@font/mainfont"
+        android:textColor="#AEB1AD"
+        android:textSize="24sp"
+        android:padding="6dp"
+        />
 
     <TextView
         android:id="@+id/roundsTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Rounds" /> <!-- Add this TextView -->
+        android:text="Rounds"
+        android:fontFamily="@font/mainfont"
+        android:textColor="#AEB1AD"
+        android:textSize="24sp"
+        android:padding="6dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="List of Players:"
+        android:fontFamily="@font/mainfont"
+        android:textColor="#AEB1AD"
+        android:textSize="24sp"
+        android:padding="6dp"
+        />
 
     <ListView
         android:id="@+id/playersListView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:fontFamily="@font/mainfont"
+        android:layout_marginBottom="16dp"
+        />
 
     <Button
         android:id="@+id/startGameButton"
-        android:layout_width="match_parent"
+        android:layout_width="145dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="60dp"
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/mainfont"
         android:text="Start Game"
-        android:layout_marginTop="16dp" />
+        android:textColor="#AEB1AD" />
 </LinearLayout>

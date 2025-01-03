@@ -8,10 +8,10 @@ data class Room(
     val players: Map<String, Player> = emptyMap(),
     val roomName: String = "",
     val endRound: Int = 0,
-    val currentRound: Int = 0
 )
 
 data class Player(
     val name: String = "",
-    val points: Int = 0
+    val points: Int = 0,
+    val currentRound: Int = 1
 )

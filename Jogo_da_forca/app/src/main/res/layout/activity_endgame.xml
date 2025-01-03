@@ -4,20 +4,37 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#2F2F41">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LeaderBoard"
+        android:textSize="34sp"
+        android:layout_marginBottom="24dp"
+        android:fontFamily="@font/mainfont"
+        android:textColor="#AEB1AD"
+        android:gravity="center"/>
 
     <TextView
         android:id="@+id/playersTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:layout_marginBottom="24dp" />
+        android:layout_marginBottom="24dp"
+        android:fontFamily="@font/mainfont"
+        android:textColor="#AEB1AD"/>
 
     <Button
         android:id="@+id/playAgainButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="69dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/mainfont"
+        android:textColor="#AEB1AD"
         android:text="Main Menu"
-        android:layout_marginBottom="16dp" />
+        android:textSize="25sp" />
 
 </LinearLayout>

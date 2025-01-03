@@ -1,44 +1,80 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="50dp"
-    android:layout_marginTop="50dp">
+    android:background="#2F2F41"
+    android:gravity="center_horizontal">
 
-
-    <!-- Campo para o nome da sala -->
-
-    <!-- Campo para o número máximo de jogadores -->
-
-    <EditText
-        android:id="@+id/roomNameEditText"
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Nome da sala"
-        android:inputType="textNoSuggestions" />
-
-
-    <EditText
-        android:id="@+id/maxPlayersEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Máximo de jogadores"
-        android:inputType="number" />
+        android:text="Create New Room"
+        android:textSize="34sp"
+        android:textColor="#AEB1AD"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:fontFamily="@font/mainfont"
+        android:padding="16dp"/>
 
     <EditText
         android:id="@+id/roundsEditText"
-        android:layout_width="wrap_content"
+        android:layout_width="381dp"
         android:layout_height="wrap_content"
-        android:hint="Enter number of rounds"
+        android:layout_marginTop="16dp"
+
+        android:fontFamily="@font/mainfont"
+        android:gravity="center"
+        android:hint="Number of rounds"
+        android:inputType="textNoSuggestions"
+        android:paddingTop="16dp"
+        android:backgroundTint="#AEB1AD"
+        android:textColorHint ="#AEB1AD"
+        android:textColor ="#AEB1AD"/>
+
+    <EditText
+        android:id="@+id/roomNameEditText"
+        android:layout_width="381dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/mainfont"
+        android:gravity="center"
+        android:hint="Room Name"
+        android:inputType="textNoSuggestions"
+        android:paddingTop="16dp"
+        android:backgroundTint="#AEB1AD"
+        android:textColorHint ="#AEB1AD"
+        android:textColor ="#AEB1AD"/>
+
+    <EditText
+        android:id="@+id/maxPlayersEditText"
+        android:layout_width="381dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/mainfont"
+        android:gravity="center"
+        android:hint="Max Palyers"
         android:inputType="number"
-        android:layout_marginBottom="16dp"/>
-    <!-- Botão para criar a sala -->
+        android:paddingTop="16dp"
+        android:backgroundTint="#AEB1AD"
+        android:textColorHint ="#AEB1AD"
+        android:textColor ="#AEB1AD"/>
+
+    <TextView
+        android:layout_width="387dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/mainfont"
+        android:padding="25dp"
+        android:text="In this Game You need to guess the words that Appear, each round will have 60 seconds and at the end it will show all the results"
+        android:textColor="#AEB1AD" />
 
     <Button
         android:id="@+id/createRoomButton"
-        android:layout_width="match_parent"
+        android:layout_width="191dp"
         android:layout_height="wrap_content"
-        android:text="Criar sala" />
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/mainfont"
+        android:text="New Room"
+        android:textColor="#AEB1AD"
+        android:textSize="25sp" />
 
 </LinearLayout>

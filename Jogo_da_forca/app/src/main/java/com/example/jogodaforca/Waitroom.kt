@@ -44,7 +44,7 @@ class WaitRoomActivity : AppCompatActivity() {
         roomNameTextView = findViewById(R.id.roomNameTextView)
         roundsTextView = findViewById(R.id.roundsTextView)
 
-        roomNameTextView.text = "Nome da Sala: $roomName"
+        roomNameTextView.text = "Room Name: $roomName"
         roomIdTextView.text = "Room ID: $roomId"
 
         database = FirebaseDatabase.getInstance().reference.child("rooms").child(roomId)
@@ -54,7 +54,7 @@ class WaitRoomActivity : AppCompatActivity() {
                 val room = snapshot.getValue(Room::class.java)
                 if (room != null) {
                     currentPlayers = room.currentPlayers
-                    currentPlayersTextView.text = "Jogadores atuais: $currentPlayers/${room.maxPlayers}"
+                    currentPlayersTextView.text = "Current Players: $currentPlayers/${room.maxPlayers}"
                     hostName = room.host
                     endRound = room.endRound
                     roundsTextView.text = "Rounds: $endRound"
@@ -112,7 +112,7 @@ class WaitRoomActivity : AppCompatActivity() {
 
     private fun updatePlayersList(players: Map<String, Player>, host: String) {
         val displayPlayers = players.map { if (it.key == host) "host: ${it.key}" else it.key }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, displayPlayers)
+        val adapter = ArrayAdapter(this, R.layout.list_item, R.id.listItemTextView, displayPlayers)
         playersListView.adapter = adapter
     }
 
