@@ -25,7 +25,7 @@
         android:fontFamily="@font/mainfont"
         android:gravity="center"
         android:hint="Number of rounds"
-        android:inputType="textNoSuggestions"
+        android:inputType="number"
         android:paddingTop="16dp"
         android:backgroundTint="#AEB1AD"
         android:textColorHint ="#AEB1AD"

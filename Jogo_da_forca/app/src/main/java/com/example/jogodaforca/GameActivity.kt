@@ -201,7 +201,7 @@ class GameActivity : AppCompatActivity() {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    // Use default word and definition in case of failure
+                    // this will happens if catch an error
                     word = "error"
                     definition = "An error occurred"
                 }
@@ -217,7 +217,7 @@ class GameActivity : AppCompatActivity() {
                     } else {
                         Log.d("GameActivity", "Image URL is empty")
                     }
-                    // Hide loading layout and start the timer
+                    // Hide loading and start the timer
                     loadingLayout.visibility = View.GONE
                     startRoundTimer()
                     resetLetterButtons()
